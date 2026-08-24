@@ -1,3 +1,7 @@
+reinstall_package:
+	@pip uninstall -y mastershelf || :
+	@pip install -e .
+
 run_front:
 	streamlit run frontend/app.py
 
