@@ -3,3 +3,5 @@ raw_data/
 
 __pycache__
 *.egg-info
+
+.DS_Store
