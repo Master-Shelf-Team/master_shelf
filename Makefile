@@ -13,5 +13,5 @@ run_api:
 test:
 	pytest tests
 
-run_preprocessing:
+run_baseline:
 	python -m mastershelf.main
