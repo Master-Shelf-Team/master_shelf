@@ -1,6 +1,6 @@
 from mastershelf.recipes.preprocessing import load_recipes
+from mastershelf.algo_filter.filtering import *
+result = final_match()
 
-data = load_recipes()
-
-print(data.head())
-print(data.shape)
+for i in result:
+    print(i)
