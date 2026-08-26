@@ -1,7 +1,8 @@
 reinstall_package:
 	@pip uninstall -y mastershelf || :
 	@pip install -e .
-	@pip install spacy python -m donwload en_core_web_sm
+	@pip install spacy
+	@python -m spacy download en_core_web_sm
 
 run_front:
 	streamlit run frontend/app.py
@@ -11,3 +12,6 @@ run_api:
 
 test:
 	pytest tests
+
+run_preprocessing:
+	python -m mastershelf.main
