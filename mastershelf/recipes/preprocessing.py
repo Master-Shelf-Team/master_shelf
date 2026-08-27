@@ -18,7 +18,9 @@ def load_recipes():
     if os.path.exists(file_path):
         print("The file exists. Loading ...")
         df_recipes_clean = pd.read_csv(file_path)
+        print("recipes loaded")
         df_recipes_clean = transform_str_to_list_clean(df_recipes_clean)
+        print("preprocess done")
     else:
         print("The file does not exist. Let's create it ...")
         df_recipes = pd.read_csv(RAW_DATA_PATH / "recipes_ingredients.csv")
@@ -44,11 +46,14 @@ def clean_recipes(data):
     #Change les strings en listes
     data = transform_str_to_list(data)
     #Divise la colonne serving size en 2 colonnes distinctes
+    print("deleting useless colomns, and spliting")
     data[["persons", "portion_size"]] = data["serving_size"].str.extract(r"(\d+)\s*\(([^)]+)\)")
     data = data.drop(columns="serving_size", axis=1)
     data["persons"] = pd.to_numeric(data["persons"],errors="coerce")
     #Retire les trop grosses valeur
+    print("deleting useless recipes")
     data = data[data["servings"] <= 50]
+    print("Creating new columns...")
     data = data[data["tags"].apply(lambda tags: any(tag in tags for tag in TIME_TO_MAKE))]
     data['type_dish'] = data['tags'].apply(lambda x: type_column(x, TYPE_DISH))
     data['type_diet'] = data['tags'].apply(lambda x: type_column(x, TYPE_DIET))
@@ -56,9 +61,11 @@ def clean_recipes(data):
     data['type_occasion'] = data['tags'].apply(lambda x: type_column(x, TYPE_OCCASION))
     data['type_origin'] = data['tags'].apply(lambda x: type_column(x, TYPE_ORIGIN))
     data = data[data["tags"].apply(len) > 0]
+    print("cleaning ingredients...")
     data["ingredients_clean"] = data["ingredients"].apply(lambda ingredients: [clean_ingredient(x) for x in ingredients])
     unique_clean = (data["ingredients_clean"].explode().dropna().unique())
     #lemmatization des ingredients
+    print("lemmatization ...")
     nlp = spacy.load("en_core_web_sm")
 
     lemmatized = []
@@ -80,7 +87,7 @@ def clean_recipes(data):
         normalize_embeddings=True,
         show_progress_bar=True
     )
-
+    print("normalization ...")
     normalization_mapping = build_normalization_mapping(
         ingredient_counts=ingredient_counts,
         embedder=embedder,
@@ -91,6 +98,7 @@ def clean_recipes(data):
     data["ingredients_normalized"] = (data["ingredients_lemmatized"].apply(lambda ingredients: [normalization_mapping[ingredient]for ingredient in ingredients]))
     with open(MODEL_PATH / "ingredient_mapping.pkl", "wb") as f:
         pickle.dump(normalization_mapping, f)
+    print("deleting extra columns")
     data = data.drop(columns= ["ingredients_lemmatized","tags","ingredients_clean","ingredients"], axis=1)
     data["ingredients"] = data["ingredients_normalized"]
     data = data.drop("ingredients_normalized", axis=1)
@@ -191,6 +199,10 @@ def build_normalization_mapping(
 
 
 def transform_str_to_list(data):
+    """
+    transforme le contenu des colonnes en liste pour le data_clean
+    """
+
     data["ingredients"] = data["ingredients"].apply(safe_literal_eval)
     data["ingredients_raw"] = data["ingredients_raw"].apply(safe_literal_eval)
     data["steps"] = data["steps"].apply(safe_literal_eval)
@@ -204,6 +216,10 @@ def transform_str_to_list(data):
 
 
 def transform_str_to_list_clean(data):
+    """
+    transforme le contenu des colonnes en liste pour le data de base
+    """
+
     data["ingredients"] = data["ingredients"].apply(safe_literal_eval)
     data["ingredients_raw"] = data["ingredients_raw"].apply(safe_literal_eval)
     data["steps"] = data["steps"].apply(safe_literal_eval)
