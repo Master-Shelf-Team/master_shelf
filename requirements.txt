@@ -10,3 +10,6 @@ sentence_transformers
 
 # Yolo
 ultralytics
+
+#Streamlit
+streamlit
