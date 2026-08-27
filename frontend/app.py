@@ -198,18 +198,18 @@ if btn_envoyer:
                 }
 
                 # REMPLACE L'URL CI-DESSOUS PAR L'URL DE TON API
-                # response = requests.post("https://ton-api-url.com/predict", files=files, data=data)
-                # reponse_json = response.json()
-                response_json = {
-"steps": [
-"Chop onions and garlic.",
-"Saute onions and garlic in olive oil until browned .",
-"Mix everything together in a deep nonstick pot.",
-"Bring to boil ( use no more than medium heat) stirring often.",
-"Turn down low and simmer at least 30 minutes -- stirring often -- you can simmer prepared, cooked, meatballs in the sauce too.-- it is easy to make your own meatballs. The sauce with thicken up as you cook and the alcohol will cook off.",
-"Serve over your favorite pasta."
-]
-}
+                response = requests.post("http://127.0.0.1:8000/ingredients", files=files, data=data)
+                response_json = response.json()
+                # response_json = {
+                # "steps": [
+                # "Chop onions and garlic.",
+                # "Saute onions and garlic in olive oil until browned .",
+                # "Mix everything together in a deep nonstick pot.",
+                # "Bring to boil ( use no more than medium heat) stirring often.",
+                # "Turn down low and simmer at least 30 minutes -- stirring often -- you can simmer prepared, cooked, meatballs in the sauce too.-- it is easy to make your own meatballs. The sauce with thicken up as you cook and the alcohol will cook off.",
+                # "Serve over your favorite pasta."
+                # ]
+                # }
 
                 # Simulation de la réponse API (à remplacer par le vrai appel)
 

@@ -40,8 +40,6 @@ def recipe_coverage(recipe_ingredients, user_ingredients):
     """
     Calculer le coverage des ingrédients
     """
-
-    print("Check coverage")
     if len(recipe_ingredients) == 0:
         return 0
 
