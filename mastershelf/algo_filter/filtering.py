@@ -1,16 +1,13 @@
 from mastershelf.recipes.preprocessing import *
 from mastershelf.inventory.inventory import *
-import mastershelf.api.fast
 import re
 
-def final_match():
+def final_match(photo_ingredient):
     """
     Charge le dataset , importe la photo et l'inventaire pour trouver les correspondances
     """
-
     data = load_recipes()
     user_inventory = get_user_inv()
-    photo_ingredient = get_photo_inv()
     available_names = list(set(set(user_inventory.keys()) | set(photo_ingredient["ingredients_list"])))
     top_recipes = data.copy()
     print("Finding matches ...")
@@ -26,22 +23,7 @@ def final_match():
     )
 
     possible_recipes[["name","steps","coverage", "n_ingredients"]].head(10)
-    return possible_recipes.iloc[3].steps
-
-
-def get_photo_inv():
-    """
-    Utilise l'API pour récupérer les ingrédients
-    """
-
-    path1 = IMAGE_PATH_1
-    path2 = IMAGE_PATH_2
-    response = None
-    try:
-        response = set(mastershelf.api.fast.app.ingredients(path2))
-        return response
-    except:
-        return PHOTO_INV
+    return possible_recipes.iloc[0].steps
 
 def get_user_inv():
     """

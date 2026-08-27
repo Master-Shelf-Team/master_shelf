@@ -13,3 +13,6 @@ ultralytics
 
 #Streamlit
 streamlit
+
+#MLflow
+mlflow
