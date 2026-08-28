@@ -5,26 +5,28 @@ from google.cloud import bigquery
 import json
 
 
-def get_matching_recipes(user_ingredients_list: dict) -> list[dict]:
+def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> list[dict]:
     client = bigquery.Client()
 
-    print("On récupère l'inventaire du user")
-    user_inventory = get_user_inv()
+    user_inventory = pantry_items
 
     # Clean et suppression des valeurs vides/espaces
+    user_inv_cleaned = [
+        k.lower().strip() for k in user_inventory if k and k.strip()
+    ]
+    print("1 - On récupère l'inventaire du placard", user_inv_cleaned)
+
     raw_ingredients = user_ingredients_list.get("ingredients_list", [])
     cleaned_input = [
         ing.lower().strip() for ing in raw_ingredients if ing and ing.strip()
     ]
-    user_inv_cleaned = [
-        k.lower().strip() for k in user_inventory.keys() if k and k.strip()
-    ]
+    print("1bis - On récupère l'inventaire de la photo", cleaned_input)
 
     # Fusion des listes en minuscules
     combined_ingredients = list(set(user_inv_cleaned) | set(cleaned_input))
+    print("1ter - On fusionne les deux inventaires", combined_ingredients)
 
-    print("On récupère l'inventaire de la photo", combined_ingredients)
-    print("On lance la query !")
+    print("2 - On lance la query !")
 
     query = """
     WITH user_ingredients AS (
@@ -60,7 +62,7 @@ def get_matching_recipes(user_ingredients_list: dict) -> list[dict]:
     query_job = client.query(query, job_config=job_config)
     results = query_job.result()
 
-    print("On retourne les résultats !")
+    print("3 - On retourne les résultats !")
 
     recipes = []
     for row in results:
