@@ -6,6 +6,7 @@ import json
 import requests
 import streamlit as st
 from PIL import Image
+import os
 
 st.set_page_config(
     page_title="Master Shelf",
@@ -13,6 +14,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+SERVICE_URL = os.environ.get("SERVICE_URL")
 
 DIETS = [
     "Peu importe",
@@ -442,7 +445,7 @@ if go:
     if not photos:
         st.warning("Ajoute au moins une photo de frigo pour lancer la recommandation.")
     else:
-        url = "https://mastershelf-8316567599.europe-west1.run.app/ingredients"
+        url = f"{SERVICE_URL}/ingredients"
 
         files = []
         for photo in photos:
@@ -457,20 +460,17 @@ if go:
                     ),
                 )
             )
-        data = {
-            "contraintes": json.dumps(
-                {
-                    "time_max": time_max,
-                    "diet": diet,
-                    "origin": origin,
-                    "pantry_items": pantry_selected,
-                }
-            )
-        }
+        payload = {
+                        "time_max": time_max,
+                        "diet": diet,
+                        "origin": origin,
+                        "pantry_items": pantry_selected,
+                    }
+        form_data = {"data": json.dumps(payload)}
 
         try:
             with st.spinner("Recherche de recette..."):
-                response = requests.post(url, files=files, data=data)
+                response = requests.post(url, files=files, data=form_data)
 
             if response.status_code != 200:
                 st.error(f"Erreur de l'API : {response.status_code}")
