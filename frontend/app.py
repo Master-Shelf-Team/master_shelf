@@ -199,20 +199,8 @@ if btn_envoyer:
                     "occasion": occasion_choisie
                 }
                 SERVICE_URL = os.environ.get("SERVICE_URL")
-                # REMPLACE L'URL CI-DESSOUS PAR L'URL DE TON API
-                print(SERVICE_URL)
                 response = requests.post(f"{SERVICE_URL}/ingredients", files=files, data=data)
                 response_json = response.json()
-                # response_json = {
-                # "steps": [
-                # "Chop onions and garlic.",
-                # "Saute onions and garlic in olive oil until browned .",
-                # "Mix everything together in a deep nonstick pot.",
-                # "Bring to boil ( use no more than medium heat) stirring often.",
-                # "Turn down low and simmer at least 30 minutes -- stirring often -- you can simmer prepared, cooked, meatballs in the sauce too.-- it is easy to make your own meatballs. The sauce with thicken up as you cook and the alcohol will cook off.",
-                # "Serve over your favorite pasta."
-                # ]
-                # }
 
                 # Simulation de la réponse API (à remplacer par le vrai appel)
 
@@ -248,6 +236,6 @@ with col_recette:
         st.markdown("### 👨‍🍳 Étapes :")
         for idx, etape in enumerate(recette[number]["steps"], 1):
             st.write(f"{idx}. {etape}")
-        st.write(f"{recette}")
+
     else:
         st.info("Importe une photo, sélectionne tes préférences et clique sur **'Obtenir ma recette'** pour voir la meilleure recette s'afficher ici !")
