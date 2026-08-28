@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 import requests
+import os
 
 # 1. Configuration de la page
 st.set_page_config(
@@ -196,9 +197,10 @@ if btn_envoyer:
                     "voyage": voyage_choisi,
                     "occasion": occasion_choisie
                 }
-
+                SERVICE_URL = os.environ.get("SERVICE_URL")
                 # REMPLACE L'URL CI-DESSOUS PAR L'URL DE TON API
-                response = requests.post("http://127.0.0.1:8000/ingredients", files=files, data=data)
+                print(SERVICE_URL)
+                response = requests.post(f"{SERVICE_URL}/ingredients", files=files, data=data)
                 response_json = response.json()
                 # response_json = {
                 # "steps": [

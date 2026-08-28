@@ -7,12 +7,8 @@ def yolo_predict(image):
     username = Path.home().name
 
     print("⏳ Chargement du model Yolo ⏳")
-    model = YOLO(f"/home/{username}/code/MitriBarbot/master_shelf/models/best.pt")
+    model = YOLO(f"/models/best.pt")
     print("✅ Model Yolo chargé ! ✅")
-
-
-    if image == None:
-        image = f"/home/{username}/code/MitriBarbot/master_shelf/raw_data/sam-test.jpg"
 
     print(f"🔎 Détection d'ingrédient pour l'image :\n{image}")
     # Baisser la confiance (conf) et augmenter le seuil d'intersection (iou)
@@ -46,27 +42,3 @@ def yolo_predict(image):
     return {
             "ingredients_list": ings
         }
-
-# Inutilisable en l'état, code à retravailler
-def save_model() -> None:
-    """
-    Persist trained YOLO model locally and on MLflow.
-    """
-    print("⏳ Enregistrement du model sur MLfLow...")
-
-    # 1. Charger votre modèle avec ses meilleurs poids
-    username = Path.home().name
-    model = YOLO(f"/home/{username}/code/MitriBarbot/master_shelf/models/best.pt")
-
-    # Récupération du nom du modèle depuis vos variables globales ou d'environnement
-    mlflow_model_name = os.environ.get("MLFLOW_MODEL_NAME", "YOLO_Ingredients_Detector")
-
-    # Enregistrement natif du modèle YOLO (Ultralytics) dans MLflow
-    mlflow.ultralytics.log_model(
-        model=model,
-        artifact_path="model",
-        registered_model_name=mlflow_model_name
-    )
-
-    print("✅ Model enregistré sur MLflow")
-    return None
