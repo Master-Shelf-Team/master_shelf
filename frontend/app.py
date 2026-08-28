@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import requests
 import os
+import random
 
 # 1. Configuration de la page
 st.set_page_config(
@@ -230,9 +231,23 @@ with col_recette:
 
     if st.session_state.recette_resultat:
         recette = st.session_state.recette_resultat
+        length = len(recette)
+
+        number = random.randint(0, length)
+
+        st.markdown(f"## 👨‍🍳 Recette : {recette[number]['name']}")
+
+        st.markdown("### 👨‍🍳 Ingrédients :")
+        liste = ""
+        for i, ing in enumerate(recette[number]["ingredients"]):
+            liste = liste + "- " + str(ing).capitalize() + "\n"
+        print(liste)
+
+        st.markdown(f"{liste}")
 
         st.markdown("### 👨‍🍳 Étapes :")
-        for idx, etape in enumerate(recette[0]["steps"], 1):
+        for idx, etape in enumerate(recette[number]["steps"], 1):
             st.write(f"{idx}. {etape}")
+        st.write(f"{recette}")
     else:
         st.info("Importe une photo, sélectionne tes préférences et clique sur **'Obtenir ma recette'** pour voir la meilleure recette s'afficher ici !")
