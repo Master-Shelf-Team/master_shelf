@@ -232,7 +232,7 @@ with col_recette:
         recette = st.session_state.recette_resultat
 
         st.markdown("### 👨‍🍳 Étapes :")
-        for idx, etape in enumerate(recette["steps"], 1):
+        for idx, etape in enumerate(recette[0]["steps"], 1):
             st.write(f"{idx}. {etape}")
     else:
         st.info("Importe une photo, sélectionne tes préférences et clique sur **'Obtenir ma recette'** pour voir la meilleure recette s'afficher ici !")
