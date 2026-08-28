@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 
 import requests
@@ -212,6 +213,30 @@ def inject_css() -> None:
             font-size: 0.75rem;
             letter-spacing: 0.04em;
         }
+        .recipe-detail { margin-top: 0.6rem; }
+        .step-list { list-style: none; padding: 0; margin: 0.7rem 0 0 0; }
+        .step-list li {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.7rem 0;
+            border-top: 1px solid rgba(61, 42, 31, 0.08);
+            color: #2C2416;
+            line-height: 1.45;
+        }
+        .step-num {
+            flex: 0 0 1.7rem;
+            height: 1.7rem;
+            border-radius: 999px;
+            background: #C45C26;
+            color: #fffaf2;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.1rem;
+        }
 
         .stButton > button {
             background: #C45C26;
@@ -251,6 +276,51 @@ def filter_recipes(time_max: int, diet: str, origin: str) -> list[dict]:
             continue
         out.append(recipe)
     return out or [r for r in SAMPLE_RECIPES if r["time"] <= time_max][:3]
+
+
+def recipes_from_api(payload: object) -> list[dict]:
+    if isinstance(payload, dict) and isinstance(payload.get("steps"), list):
+        return [payload]
+    if isinstance(payload, dict):
+        for key in ("recipes", "data", "result"):
+            if key in payload:
+                return recipes_from_api(payload[key])
+        return []
+    if isinstance(payload, list):
+        found: list[dict] = []
+        for item in payload:
+            found.extend(recipes_from_api(item))
+        return found
+    return []
+
+
+def render_recipe(recipe: dict, time_max: int, diet: str, origin: str) -> None:
+    title = recipe.get("title") or recipe.get("name") or "Ta recette"
+    steps = [str(step).strip() for step in recipe.get("steps") or [] if str(step).strip()]
+    if not steps:
+        st.warning("L'API a répondu, mais sans étapes de recette.")
+        return
+
+    items = "".join(
+        (
+            "<li>"
+            f'<span class="step-num">{index}</span>'
+            f"<span>{html.escape(step)}</span>"
+            "</li>"
+        )
+        for index, step in enumerate(steps, start=1)
+    )
+    st.markdown(
+        f"""
+        <div class="recipe-card recipe-detail">
+          <span class="match">{len(steps)} étapes</span>
+          <h4>🍽️ {html.escape(str(title))}</h4>
+          <div class="meta">{time_max} min max · {html.escape(diet)} · {html.escape(origin)}</div>
+          <ol class="step-list">{items}</ol>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 inject_css()
@@ -342,7 +412,6 @@ if go:
     if not photos:
         st.warning("Ajoute au moins une photo de frigo pour lancer la recommandation.")
     else:
-        recipes = filter_recipes(time_max, diet, origin)
         url = "http://localhost:8000/votre-endpoint-api"
 
         files = []
@@ -369,45 +438,31 @@ if go:
         }
 
         try:
-            with st.spinner("Envoi en cours..."):
+            with st.spinner("Recherche de recette..."):
                 response = requests.post(url, files=files, data=data)
 
-            if response.status_code == 200:
-                st.success("Photos envoyées avec succès.")
-                try:
-                    st.json(response.json())
-                except ValueError:
-                    st.write(response.text)
-            else:
+            if response.status_code != 200:
                 st.error(f"Erreur de l'API : {response.status_code}")
                 st.write(response.text)
+            else:
+                try:
+                    payload = response.json()
+                except ValueError:
+                    st.error("L'API n'a pas renvoyé de JSON.")
+                    st.write(response.text)
+                else:
+                    recipes = recipes_from_api(payload)
+                    if not recipes:
+                        st.warning("Aucune recette avec des étapes n'a été trouvée dans la réponse.")
+                        st.json(payload)
+                    else:
+                        st.markdown("### Recette")
+                        for recipe in recipes:
+                            render_recipe(recipe, time_max, diet, origin)
         except requests.exceptions.ConnectionError:
             st.error(
                 "Impossible de se connecter à l'API. Vérifiez qu'elle est bien "
                 "démarrée."
             )
-
-        st.markdown("### Suggestions")
-        st.caption(
-                "Aperçu d’interface : les cartes ci-dessous sont des exemples. "
-                "Le modèle de recommandation viendra se brancher ici."
-            )
-            
-        rows = [recipes[i : i + 3] for i in range(0, len(recipes), 3)]
-        for row in rows:
-            cols = st.columns(3, gap="medium")
-            for col, recipe in zip(cols, row):
-                with col:
-                    st.markdown(
-                        f"""
-                        <div class="recipe-card">
-                          <span class="match">{recipe["match"]}% match</span>
-                          <h4>{recipe["emoji"]} {recipe["title"]}</h4>
-                          <div class="meta">{recipe["time"]} min · {recipe["diet"]} · {recipe["origin"]}</div>
-                          <p>{recipe["blurb"]}</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
 else:
     st.info("Charge tes photos, règle tes filtres, puis lance la recherche.")
