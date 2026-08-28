@@ -12,10 +12,14 @@ sentence_transformers
 # Yolo
 ultralytics
 
-#Streamlit
+# Streamlit
 streamlit
 
-#MLflow
+# MLflow
 mlflow
 
+# Big Query
+google-cloud-bigquery
+
+# Autres
 spacy
