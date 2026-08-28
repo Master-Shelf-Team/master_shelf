@@ -17,3 +17,5 @@ streamlit
 
 #MLflow
 mlflow
+
+spacy

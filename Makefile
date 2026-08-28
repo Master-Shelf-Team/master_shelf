@@ -1,7 +1,6 @@
 reinstall_package:
 	@pip uninstall -y mastershelf || :
 	@pip install -e .
-	@pip install spacy
 	@python -m spacy download en_core_web_sm
 
 run_front:
