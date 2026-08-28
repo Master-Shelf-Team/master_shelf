@@ -41,6 +41,21 @@ ORIGINS = [
     "Américaine",
 ]
 
+PANTRY_ITEMS = [
+    "Huile d'olive",
+    "Beurre",
+    "Crème fraîche",
+    "Sel",
+    "Poivre",
+    "Épices (paprika, curry...)",
+    "Farine",
+    "Sucre",
+    "Riz",
+    "Pâtes",
+    "Ail",
+    "Oignon",
+]
+
 SAMPLE_RECIPES = [
     {
         "title": "Pasta primavera du frigo",
@@ -404,6 +419,21 @@ with right:
         """,
         unsafe_allow_html=True,
     )
+    st.markdown(
+            """
+            <div class="panel">
+              <h3>Ton garde-manger</h3>
+              <div class="hint">Qu'est ce qu'il y a de beau là dedans?</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    pantry_selected = st.multiselect(
+    label="Ingrédients de base à disposition (hors frigo) :",
+    options=PANTRY_ITEMS,
+    default=["Huile d'olive", "Beurre", "Poivre"],  # Pré-cochés par défaut si besoin
+    help="Cherche et sélectionne les ingrédients de ton placard",
+    )
 
 st.write("")
 go = st.button("Trouver des recettes", type="primary", use_container_width=True)
@@ -412,7 +442,7 @@ if go:
     if not photos:
         st.warning("Ajoute au moins une photo de frigo pour lancer la recommandation.")
     else:
-        url = "http://localhost:8000/votre-endpoint-api"
+        url = "https://mastershelf-8316567599.europe-west1.run.app/ingredients"
 
         files = []
         for photo in photos:
@@ -433,6 +463,7 @@ if go:
                     "time_max": time_max,
                     "diet": diet,
                     "origin": origin,
+                    "pantry_items": pantry_selected,
                 }
             )
         }
