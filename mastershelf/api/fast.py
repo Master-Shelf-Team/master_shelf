@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from ultralytics import YOLO
 import cv2
 from pathlib import Path
-from mastershelf.algo_filter.filtering import final_match
+from mastershelf.algo_filter.filtering import final_match, get_matching_recipes
 from mastershelf.vision.detector import yolo_predict
 from PIL import Image
 import io
@@ -44,13 +44,11 @@ async def ingredients(
 
     print(f"🔎 Recherche de la meilleure recette pour la liste d'ingrédients 🔎")
 
-    results = final_match(ing_list)
+    results = get_matching_recipes(ing_list)
 
     print(f"💥 Meilleure recette trouvée ! 💥\n ➡️ Envoie de la réponse au Front")
 
-    return  {
-                "steps": results
-            }
+    return  results
 
 # http://127.0.0.1:8000/recipe?ingredients=tomato+onion+cheese > à corriger quand on sera rendu là
 @app.get("/recipe")

@@ -1,6 +1,92 @@
 from mastershelf.recipes.preprocessing import *
 from mastershelf.inventory.inventory import *
 import re
+from google.cloud import bigquery
+import json
+
+
+def get_matching_recipes(user_ingredients_list: dict) -> list[dict]:
+    client = bigquery.Client()
+
+    print("On récupère l'inventaire du user")
+    user_inventory = get_user_inv()
+
+    # Clean et suppression des valeurs vides/espaces
+    raw_ingredients = user_ingredients_list.get("ingredients_list", [])
+    cleaned_input = [
+        ing.lower().strip() for ing in raw_ingredients if ing and ing.strip()
+    ]
+    user_inv_cleaned = [
+        k.lower().strip() for k in user_inventory.keys() if k and k.strip()
+    ]
+
+    # Fusion des listes en minuscules
+    combined_ingredients = list(set(user_inv_cleaned) | set(cleaned_input))
+
+    print("On récupère l'inventaire de la photo", combined_ingredients)
+    print("On lance la query !")
+
+    query = """
+    WITH user_ingredients AS (
+      SELECT DISTINCT LOWER(TRIM(ing)) AS ing
+      FROM UNNEST(@user_ing_list) AS ing
+    )
+
+    SELECT
+      r.name,
+      r.steps,
+      r.ingredients,
+      ARRAY_LENGTH(r.ingredients) AS nb_ingredients_utilises
+    FROM `le-wagon-ds-2327.mastershelf.recipes_array` r
+    WHERE ARRAY_LENGTH(r.ingredients) > 0
+      AND (
+        -- COUNT(DISTINCT) empêche qu'un ingrédient comptabilise plusieurs matchs
+        SELECT COUNT(DISTINCT recipe_ing)
+        FROM UNNEST(r.ingredients) AS recipe_ing
+        JOIN user_ingredients ui
+          ON STRPOS(LOWER(recipe_ing), ui.ing) > 0
+      ) = ARRAY_LENGTH(r.ingredients)
+    ORDER BY nb_ingredients_utilises DESC LIMIT 5;
+    """
+
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ArrayQueryParameter(
+                "user_ing_list", "STRING", combined_ingredients
+            )
+        ]
+    )
+
+    query_job = client.query(query, job_config=job_config)
+    results = query_job.result()
+
+    print("On retourne les résultats !")
+
+    recipes = []
+    for row in results:
+        recipe = dict(row)
+        raw_steps = recipe.get("steps")
+
+        # Conversion de la string Python (ex: "['étape 1', 'étape 2']") en liste
+        if isinstance(raw_steps, str):
+            try:
+                recipe["steps"] = ast.literal_eval(raw_steps)
+            except (ValueError, SyntaxError):
+                recipe["steps"] = [raw_steps]
+
+        recipes.append(recipe)
+
+    return recipes
+
+
+# # Exemple d'appel de la fonction :
+# if __name__ == "__main__":
+#     ingredients_test = ['celery', 'carrot', 'onion', 'olive oil', 'chicken', 'milk', 'cheese']
+#     recipes = get_matching_recipes(ingredients_test)
+
+#     print(f"Nombre de recettes trouvées : {len(recipes)}")
+#     if recipes:
+#         print("Première recette :", recipes[0]["name"])
 
 def final_match(photo_ingredient):
     """
