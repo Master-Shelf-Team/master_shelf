@@ -25,6 +25,10 @@ def load_recipes():
         print("The file does not exist. Let's create it ...")
         df_recipes = pd.read_csv(RAW_DATA_PATH / "recipes_ingredients.csv")
         df_recipes_clean = clean_recipes(df_recipes)
+        df_recipes_clean = df_recipes_clean.sample(100000)
+        df_recipes_clean["ingredients"] = df_recipes_clean["ingredients"].apply(
+    lambda x: [str(i).strip() for i in x]
+)
         df_recipes_clean.to_csv(file_path, index=False)
     return df_recipes_clean
 

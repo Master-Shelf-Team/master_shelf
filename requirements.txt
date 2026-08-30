@@ -8,6 +8,7 @@ python-multipart
 httpx<0.28
 pytest-asyncio
 sentence_transformers
+google-cloud-bigquery
 
 # Yolo
 ultralytics
