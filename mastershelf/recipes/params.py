@@ -25,6 +25,8 @@ QUALITY_WORDS = [
     "approximately", "about"
 ]
 
+OTHER_WORDS = ["water", "salt"]
+
 UNIT_WORDS = [
     "g", "kg", "gram", "grams",
     "ml", "l", "liter", "liters",
@@ -40,6 +42,7 @@ WORDS_TO_REMOVE = (
         + SIZE_WORDS
         + QUALITY_WORDS
         + UNIT_WORDS
+        +OTHER_WORDS
     )
 
 TIME_TO_MAKE = ['15-minutes-or-less', '30-minutes-or-less', '60-minutes-or-less']

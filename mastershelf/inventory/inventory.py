@@ -1,5 +1,5 @@
 PHOTO_INV = {
-    "ingredients_list": ["chicken breast","tomato","tomato","onion","carrot","egg","cheddar cheese","bell pepper"]
+    "ingredients_list": ["chicken","tomato","tomato","onion","carrot","egg","cheddar cheese","bell pepper"]
 }
 
 
@@ -15,6 +15,3 @@ USER_INV = {
     "rice": {"quantity": 500, "unit": "g"},
     "pasta": {"quantity": 500, "unit": "g"}
 }
-
-IMAGE_PATH_1 = "../../raw_data/sam-test2.jpg"
-IMAGE_PATH_2 = "../../raw_data/sam-test.jpg"
