@@ -221,6 +221,12 @@ def inject_css() -> None:
             font-size: 1.18rem;
             color: #2C2416;
         }
+        .recipe-card h5 {
+                    font-family: "Fraunces", serif;
+                    margin: 0.15rem 0 0.35rem 0;
+                    font-size: 1.18rem;
+                    color: #2C2416;
+                }
         .meta { color: #6d6254; font-size: 0.86rem; margin-bottom: 0.45rem; }
         .match {
             display: inline-block;
@@ -315,6 +321,7 @@ def recipes_from_api(payload: object) -> list[dict]:
 def render_recipe(recipe: dict, time_max: int, diet: str, origin: str) -> None:
     title = recipe.get("title") or recipe.get("name") or "Ta recette"
     steps = [str(step).strip() for step in recipe.get("steps") or [] if str(step).strip()]
+    ingredients = [str(ingredient).strip() for ingredient in recipe.get("ingredients") or [] if str(ingredient).strip()]
     if not steps:
         st.warning("L'API a répondu, mais sans étapes de recette.")
         return
@@ -328,12 +335,26 @@ def render_recipe(recipe: dict, time_max: int, diet: str, origin: str) -> None:
         )
         for index, step in enumerate(steps, start=1)
     )
+
+    ings = "".join(
+            (
+                "<li>"
+                f'<span class="step-num">&bull;</span>'
+                f"<span>{html.escape(ingredient.capitalize())}</span>"
+                "</li>"
+            )
+            for index, ingredient in enumerate(ingredients, start=1)
+        )
+
     st.markdown(
         f"""
         <div class="recipe-card recipe-detail">
           <span class="match">{len(steps)} étapes</span>
           <h4>🍽️ {html.escape(str(title))}</h4>
           <div class="meta">{time_max} min max · {html.escape(diet)} · {html.escape(origin)}</div>
+          <h5>🦐 Ingrédients</h5>
+          <ul class="step-list">{ings}</ul>
+          <h5>➡️ Etapes</h5>
           <ol class="step-list">{items}</ol>
         </div>
         """,
