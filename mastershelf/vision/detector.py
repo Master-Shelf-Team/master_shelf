@@ -2,6 +2,7 @@ import os
 import mlflow
 from ultralytics import YOLO
 from pathlib import Path
+import cv2
 
 def yolo_predict(image):
     username = Path.home().name
@@ -37,8 +38,13 @@ def yolo_predict(image):
             print(f"💥 Objet détecté : {category_name} (Confiance : {confidence:.2f})")
 
             ings.append(category_name)
+    # 3. Récupérer l'image avec les boîtes dessinées (format BGR pour OpenCV)
+    annotated_frame = results[0].plot()
 
+    # 4. Convertir BGR en RGB (Matplotlib utilise le format RGB)
+    annotated_frame_rgb = cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB)
     print(ings)
     return {
-            "ingredients_list": ings
+            "ingredients_list": ings,
+            "imagebox" : annotated_frame_rgb
         }
