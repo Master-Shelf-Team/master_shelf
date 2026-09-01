@@ -185,6 +185,7 @@ def inject_css() -> None:
 
         html, body, [class*="css"] {
             font-family: "Outfit", sans-serif;
+            background-color: C7B383;
         }
 
         .stApp {
@@ -581,6 +582,8 @@ if go:
                         st.warning("Aucune recette avec des étapes n'a été trouvée dans la réponse.")
                         st.json(payload)
                     else:
+                        st.image( image,caption=uploaded.name, use_container_width=True)
+                        st.pyplot(recipes['imagebox'])
                         st.markdown("### Recette")
                         for recipe in recipes:
                             render_recipe(recipe, time_max, diet, origin)
