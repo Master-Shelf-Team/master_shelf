@@ -18,45 +18,105 @@ st.set_page_config(
 SERVICE_URL = os.environ.get("SERVICE_URL")
 
 DIETS = [
-    "Peu importe",
-    "Omnivore",
-    "Végétarien",
-    "Vegan",
-    "Sans gluten",
-    "Sans lactose",
-    "Halal",
-    "Pescétarien",
-    "Keto",
+    "not important", "dietary", "low-carb", "low-sodium", "low-cholesterol", "healthy",
+    "vegetarian", "low-calorie", "low-protein", "healthy-2", "inexpensive",
+    "low-saturated-fat", "kid-friendly", "low-fat", "pasta-rice-and-grains",
+    "comfort-food", "spicy", "kosher", "very-low-carbs", "diabetic",
+    "toddler-friendly", "high-protein", "gluten-free", "egg-free",
+    "high-calcium", "heirloom-historical", "dairy-free", "infant-baby-friendly"
 ]
 
 ORIGINS = [
-    "Peu importe",
-    "Française",
-    "Italienne",
-    "Espagnole",
-    "Maghrébine",
-    "Libanaise",
-    "Indienne",
-    "Japonaise",
-    "Chinoise",
-    "Thaïlandaise",
-    "Mexicaine",
-    "Américaine",
+    "not important", "north-american", "american", "european", "asian", "mexican",
+    "australian", "canadian", "southwestern-united-states", "midwestern",
+    "south-west-pacific", "thai", "chinese", "southern-united-states",
+    "african", "jewish-ashkenazi", "italian", "indian", "tex-mex",
+    "central-american", "japanese", "northeastern-united-states", "irish",
+    "russian", "caribbean", "californian", "german", "middle-eastern",
+    "spanish", "greek", "cuban", "indonesian", "guatemalan",
+    "danish", "vietnamese", "british-columbian", "scandinavian", "argentine",
+    "south-american", "english", "south-african", "nigerian", "cajun",
+    "pacific-northwest", "pakistani"
+]
+
+DISHES = [
+    "not important", "vegetables", "salads", "cookies-and-brownies", "beverages", "sandwiches",
+    "breads", "pasta", "sweet", "sauces", "quick-breads",
+    "salad-dressings", "cocktails", "bisques-cream-soups", "cakes", "bar-cookies",
+    "candy", "spaghetti", "savory-sauces", "puddings-and-mousses", "cobblers-and-crisps",
+    "clear-soups", "sweet-sauces", "pies-and-tarts", "brownies", "coffee-cakes",
+    "pork-loins", "pork-chops", "roast-beef", "barbecue", "ravioli-tortellini",
+    "jams-and-preserves", "scones", "savory-pies", "omelets-and-frittatas", "cheesecake",
+    "roast", "chili", "granola-and-porridge", "pies", "chowders",
+    "pancakes-and-waffles", "shakes", "stews", "cupcakes", "garnishes",
+    "rolled-cookies"
+]
+
+OCCASIONS = [
+    "not important", "dinner-party", "brunch", "to-go", "potluck", "summer",
+    "christmas", "fall", "spring", "winter", "romantic",
+    "picnic", "independence-day", "new-years", "thanksgiving", "st-patricks-day",
+    "valentines-day", "camping", "barbecue", "wedding", "mardi-gras-carnival",
+    "hanukkah", "easter", "super-bowl"
+]
+
+MEALS = [
+    "not important", "main-dish", "appetizers", "dinner-party", "desserts", "lunch",
+    "brunch", "side-dishes", "one-dish-meal", "beverages", "breakfast",
+    "potluck", "snacks", "picnic", "cocktails", "finger-food",
+    "frozen-desserts", "barbecue"
 ]
 
 PANTRY_ITEMS = [
-    "Huile d'olive",
-    "Beurre",
-    "Crème fraîche",
-    "Sel",
-    "Poivre",
-    "Épices (paprika, curry...)",
-    "Farine",
-    "Sucre",
-    "Riz",
-    "Pâtes",
-    "Ail",
-    "Oignon",
+    "alcohol", "all", "almond", "apple", "apple juice", "apricot",
+    "artichoke hearts", "asparagus", "avocado", "baking powder", "baking soda",
+    "banana", "barbecue", "barbecue sauce", "basil", "bean sprouts", "beef",
+    "beef broth", "bell pepper", "beverages", "black bean", "blueberry",
+    "boiling water", "bread", "breadcrumb", "broccoli", "broth", "brown sugar",
+    "butter", "cabbage", "cajun", "californian", "camping", "canadian",
+    "capers", "cardamom", "carrot", "cashew", "cauliflower", "cayenne",
+    "cayenne pepper", "celery", "celery seed", "central-american", "cheese",
+    "cherry", "chicken", "chicken broth", "chili", "chili sauce", "chinese",
+    "chives", "chocolate", "christmas", "cilantro mint", "cinnamon", "clove",
+    "cloves", "cocktails", "coconut", "coconut milk", "coffee", "cold water",
+    "comfort-food", "cooking oil", "cooking spray", "coriander", "corn",
+    "corn syrup", "cornmeal", "cornstarch", "cranberries", "cream",
+    "cream cheese", "cuban", "cucumber", "cumin", "curry powder", "dairy-free",
+    "danish", "date", "desserts", "diabetic", "dietary", "dill", "dinner-party",
+    "dried cranberries", "easter", "egg", "egg-free", "eggplant", "english",
+    "european", "fall", "finger-food", "fish", "fish sauce", "flour",
+    "frozen-desserts", "garlic", "german", "ginger", "gluten-free",
+    "graham cracker crumbs", "grape", "green beans", "green onion", "greek",
+    "ground", "guatemalan", "hanukkah", "healthy", "healthy-2", "heavy cream",
+    "heirloom-historical", "hoisin sauce", "honey", "horseradish", "hot pepper sauce",
+    "hot sauce", "hot water", "ice cream", "ice cubes", "independence-day",
+    "indian", "indonesian", "inexpensive", "infant-baby-friendly", "italian",
+    "italian seasoning", "japanese", "jewish-ashkenazi", "ketchup", "kid-friendly",
+    "kidney bean", "kosher", "lemon", "lemon juice", "lemon pepper", "lettuce",
+    "lime", "lime juice", "lunch", "main-dish", "mardi-gras-carnival", "maple syrup",
+    "marshmallows", "mayonnaise", "mexican", "midwestern", "milk", "mint leaves",
+    "mixed vegetables", "molasses", "monterey jack", "mushroom", "mustard",
+    "mustard powder", "mustard seed", "new-years", "nigerian", "noodles",
+    "north-american", "northeastern-united-states", "nutmeg", "nuts", "oatmeal",
+    "oats", "oil", "olives", "onion", "onion powder", "orange", "orange juice",
+    "oregano", "pacific-northwest", "pakistani", "paprika", "parsley", "pasta",
+    "pasta-rice-and-grains", "peach", "peanut", "peanut butter", "peanut oil",
+    "pear", "peas", "pecans", "pepper", "pepperoni", "pesto", "picnic", "pineapple",
+    "pineapple juice", "pork", "potato", "potluck", "powdered sugar", "pumpkin",
+    "pumpkin pie spice", "raisins", "raspberry", "refried beans", "rice",
+    "romantic", "rosemary", "sage", "salat", "salmon", "salsa", "sausage",
+    "scandinavian", "seasoning", "sesame oil", "sesame seeds", "shallots",
+    "shellfish", "shrimp", "side-dishes", "snacks", "soup", "sour cream",
+    "south-african", "south-american", "south-west-pacific", "southern-united-states",
+    "southwestern-united-states", "spicy", "spinach", "splenda sugar substitute",
+    "spray", "spring", "st-patricks-day", "steak", "strawberry", "sugar", "summer",
+    "super-bowl", "sweet potato", "taco seasoning", "tarragon", "tartar", "tex-mex",
+    "thai", "thanksgiving", "thyme", "toddler-friendly", "to-go", "tofu", "tomato",
+    "tomato paste", "tomato sauce", "tortilla chips", "tuna", "turkey", "turmeric",
+    "valentines-day", "vanilla", "vegetable broth", "vegetarian", "very-low-carbs",
+    "vietnamese", "vinegar", "walnut", "warm water", "water", "water chestnuts",
+    "wedding", "whipped cream", "whipped topping", "winter", "worcestershire sauce",
+    "yellow cake mix", "yogurt", "zucchini"
 ]
 
 SAMPLE_RECIPES = [
@@ -205,6 +265,10 @@ def inject_css() -> None:
             border-radius: 999px;
             padding: 0.22rem 0.7rem;
             font-size: 0.8rem;
+        }
+
+        p {
+            color: #3d2a1f;
         }
 
         .recipe-card {
@@ -424,12 +488,15 @@ with right:
 
     time_max = st.slider(
         "Temps de recette (minutes)",
-        min_value=10,
-        max_value=120,
-        value=40,
-        step=5,
+        min_value=0,
+        max_value=60,
+        value=15,
+        step=15,
         help="On écarte les plats plus longs que ce plafond.",
     )
+    occasion = st.selectbox("Type d'occasion", OCCASIONS, index=0)
+    dish = st.selectbox("Type de préparation", DISHES, index=0)
+    meal = st.selectbox("Repas de la journée", MEALS, index=0)
     diet = st.selectbox("Régime alimentaire", DIETS, index=0)
     origin = st.selectbox("Provenance du plat", ORIGINS, index=0)
 
@@ -437,6 +504,9 @@ with right:
         f"""
         <div class="chip-row">
           <span class="chip">⏱ ≤ {time_max} min</span>
+          <span class="chip">{occasion}</span>
+          <span class="chip">{dish}</span>
+          <span class="chip">{meal}</span>
           <span class="chip">{diet}</span>
           <span class="chip">{origin}</span>
         </div>
@@ -455,7 +525,7 @@ with right:
     pantry_selected = st.multiselect(
     label="Ingrédients de base à disposition (hors frigo) :",
     options=PANTRY_ITEMS,
-    default=["Huile d'olive", "Beurre", "Poivre"],  # Pré-cochés par défaut si besoin
+    default=["butter", "pepper"],  # Pré-cochés par défaut si besoin
     help="Cherche et sélectionne les ingrédients de ton placard",
     )
 
@@ -483,6 +553,9 @@ if go:
             )
         payload = {
                         "time_max": time_max,
+                        "occasion": occasion,
+                        "dish": dish,
+                        "meal": meal,
                         "diet": diet,
                         "origin": origin,
                         "pantry_items": pantry_selected,
