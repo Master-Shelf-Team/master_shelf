@@ -1,0 +1,82 @@
+from sklearn.preprocessing import MultiLabelBinarizer
+from numpy import hstack
+from sklearn.neighbors import NearestNeighbors
+from sklearn.model_selection import ParameterGrid
+
+
+def predict_closer(user , df_clean):
+    #On créé les mlb pour chaque colonnes à encoder (permettra de faire des 'groupes de colonnes avec le même poids, tout en choisissant les poids')
+    mlb_dish = MultiLabelBinarizer()
+    mlb_diet = MultiLabelBinarizer()
+    mlb_meal = MultiLabelBinarizer()
+    mlb_occasion = MultiLabelBinarizer()
+    mlb_origin = MultiLabelBinarizer()
+    mlb_time_to_make = MultiLabelBinarizer()
+
+
+    param_grid = {'dish':[3], 'diet':[5], 'meal':[1], 'occasion':[1],
+              'origin':[1], 'time_to_make':[3]}
+
+    grid = list(ParameterGrid(param_grid))
+
+
+    # On applique les mlb aux colonnes
+    X_dish = mlb_dish.fit_transform(df_clean['type_dish'])
+    X_diet = mlb_diet.fit_transform(df_clean['type_diet'])
+    X_meal = mlb_meal.fit_transform(df_clean['type_meal'])
+    X_occasion = mlb_occasion.fit_transform(df_clean['type_occasion'])
+    X_origin = mlb_origin.fit_transform(df_clean['type_origin'])
+    X_time_to_make = mlb_time_to_make.fit_transform(df_clean['time_to_make'])
+
+    history = get_history()
+
+    if not user["dish"] and not user["origin"] and user["time_max"] == "0" and not user["diet"] and not user["meal"] and not user["occasion"]:
+        X_test_dish = mlb_dish.transform([[max(set(history["dish"]), key=history["dish"].count)]])
+        X_test_diet = mlb_diet.transform([[max(set(history["diet"]), key=history["diet"].count)]])
+        X_test_meal = mlb_meal.transform([[max(set(history["meal"]), key=history["meal"].count)]])
+        X_test_occasion = mlb_occasion.transform([[max(set(history["occasion"]), key=history["occasion"].count)]])
+        X_test_origin = mlb_origin.transform([[max(set(history["origin"]), key=history["origin"].count)]])
+        X_test_time_to_make = mlb_time_to_make.transform([[max(set(history["time_max"]), key=history["time_max"].count)]])
+    else:
+        X_test_dish = mlb_dish.transform([user["dish"]])
+        X_test_diet = mlb_diet.transform([user['diet']])
+        X_test_meal = mlb_meal.transform([user["meal"]])
+        X_test_occasion = mlb_occasion.transform([user['occasion']])
+        X_test_origin = mlb_origin.transform([user['origin']])
+        X_test_time_to_make = mlb_time_to_make.transform([user['time_max']])
+
+
+    result = []
+    for param in grid:
+        X = hstack([X_dish * param['dish'],X_diet * param['diet'],X_meal*param['meal'],
+                X_occasion * param['occasion'],X_origin * param['origin'],
+                X_time_to_make * param['time_to_make']])
+
+
+        X_test = hstack([X_test_dish * param['dish'], X_test_diet * param['diet'],X_test_meal*param['meal'],
+                        X_test_occasion * param['occasion'],X_test_origin * param['origin'],
+                        X_test_time_to_make * param['time_to_make']])
+
+        model = NearestNeighbors(
+            n_neighbors=5,
+            metric="cosine")
+
+        model.fit(X)
+        distances, indices = model.kneighbors(X_test)
+        result.append({
+        **param,
+        "score": distances,
+        "recipe_index": indices
+    })
+        print(X_test)
+    return result
+
+
+def get_history():
+    history = {'time_max': ['15',"30", "15", "15"],
+    'occasion': ['summer', "spring", "brunch", "spring"],
+    'dish': ["vegetables","pasta" , "vegetables" , "vegetables"],
+    'meal': ['main-dish', 'main-dish', 'main-dish', 'main-dish', 'dessert'],
+    'diet': ['gluten-free', 'dietary', 'dietary', 'dietary' , 'dietary', 'gluten-free'],
+    'origin': ['american', "european", "european", "european" , "american"]}
+    return history
