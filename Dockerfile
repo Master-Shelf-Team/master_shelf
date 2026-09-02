@@ -1,7 +1,7 @@
 FROM python:3.10.6-slim
 
 COPY mastershelf /mastershelf
-COPY models/best107.pt /models/best107.pt
+COPY models/best.pt /models/best.pt
 COPY raw_data/recipes_clean.csv /raw_data/recipes_clean.csv
 COPY requirements.txt /requirements.txt
 COPY static /static
