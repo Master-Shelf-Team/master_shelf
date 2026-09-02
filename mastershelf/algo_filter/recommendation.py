@@ -68,8 +68,26 @@ def predict_closer(user , df_clean):
         "score": distances,
         "recipe_index": indices
     })
-        print(X_test)
-    return result
+
+    response = []
+    for i in list(result[0]["recipe_index"][0]):
+        dict = {}
+        dict["name"] = str(df_clean.iloc[i]["name"])
+        dict["ingredients_raw"] = df_clean.iloc[i]["ingredients_raw"]
+        dict["steps"] = df_clean.iloc[i]["steps"]
+        dict["servings"] = int(df_clean.iloc[i]["servings"])
+        dict["persons"] = int(df_clean.iloc[i]["persons"])
+        dict["portion_size"] = df_clean.iloc[i]["portion_size"]
+        dict["ingredients_clean"] = list(df_clean.iloc[i]["ingredients_clean"])
+        dict["type_dish"] = list(df_clean.iloc[i]["type_dish"])
+        dict["type_diet"] = list(df_clean.iloc[i]["type_diet"])
+        dict["type_meal"] = list(df_clean.iloc[i]["type_meal"])
+        dict["type_occasion"] = list(df_clean.iloc[i]["type_occasion"])
+        dict["type_origin"] = list(df_clean.iloc[i]["type_origin"])
+        dict["time_to_make"] = df_clean.iloc[i]["time_to_make"]
+        response.append(dict)
+
+    return response
 
 
 def get_history():
