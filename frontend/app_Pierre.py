@@ -7,6 +7,7 @@ import requests
 import streamlit as st
 from PIL import Image
 import os
+import numpy as np
 
 st.set_page_config(
     page_title="Master Shelf",
@@ -577,13 +578,13 @@ if go:
                     st.error("L'API n'a pas renvoyé de JSON.")
                     st.write(response.text)
                 else:
-                    recipes = recipes_from_api(payload)
+                    recipes = recipes_from_api(payload["results"])
                     if not recipes:
                         st.warning("Aucune recette avec des étapes n'a été trouvée dans la réponse.")
-                        st.json(payload)
+                        st.json(payload["results"])
                     else:
-                        st.image( image,caption=uploaded.name, use_container_width=True)
-                        st.pyplot(recipes['imagebox'])
+                        imagebox = np.array(payload["imagebox"])
+                        st.image(imagebox)
                         st.markdown("### Recette")
                         for recipe in recipes:
                             render_recipe(recipe, time_max, diet, origin)
