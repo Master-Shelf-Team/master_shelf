@@ -65,11 +65,20 @@ async def ingredients(
     print("Dict final récuperé :", contraintes_dict)
     print("Pantry items :", pantry_items)
 
+    print("Ing_list", ing_list)
+
     results = get_matching_recipes(ing_list, pantry_items)
 
     print(f"💥 Meilleure recette trouvée ! 💥\n ➡️ Envoie de la réponse au Front")
 
-    return  results
+    imagebox = ing_list["imagebox"].tolist()
+
+    response = {
+            "results" : results,
+            "imagebox": imagebox
+            }
+
+    return  response
 
 @app.get("/")
 def root():

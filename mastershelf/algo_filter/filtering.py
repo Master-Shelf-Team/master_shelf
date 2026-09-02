@@ -30,25 +30,25 @@ def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> lis
 
     query = """
     WITH user_ingredients AS (
-    SELECT DISTINCT LOWER(TRIM(ing)) AS ing
-    FROM UNNEST(@user_ing_list) AS ing
+      SELECT DISTINCT LOWER(TRIM(ing)) AS ing
+      FROM UNNEST(@user_ing_list) AS ing
     )
 
     SELECT
-    r.name,
-    r.steps,
-    r.ingredients,
-    ARRAY_LENGTH(r.ingredients) AS nb_ingredients_utilises
-    FROM `wagon-bootcamp-501612-i1.recipes_clean_300.recipes_final_array` r
+      r.name,
+      r.steps,
+      r.ingredients,
+      ARRAY_LENGTH(r.ingredients) AS nb_ingredients_utilises
+    FROM `le-wagon-ds-2327.mastershelf.recipes_array` r
     WHERE ARRAY_LENGTH(r.ingredients) > 0
-    AND (
+      AND (
+        -- COUNT(DISTINCT) empêche qu'un ingrédient comptabilise plusieurs matchs
         SELECT COUNT(DISTINCT recipe_ing)
         FROM UNNEST(r.ingredients) AS recipe_ing
         JOIN user_ingredients ui
-        ON LOWER(TRIM(recipe_ing)) = ui.ing
-    ) = ARRAY_LENGTH(r.ingredients)
-    ORDER BY nb_ingredients_utilises DESC
-    LIMIT 5
+          ON STRPOS(LOWER(recipe_ing), ui.ing) > 0
+      ) = ARRAY_LENGTH(r.ingredients)
+    ORDER BY nb_ingredients_utilises DESC LIMIT 5;
     """
     #J'ai changé la query pour trouver un exact match , sinon eggplant = egg , maintenat que tout est catégorisé c'est plus rapide
     # et le chemin vers le nouveau dataset propre final
