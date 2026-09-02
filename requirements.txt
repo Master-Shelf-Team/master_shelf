@@ -21,6 +21,8 @@ mlflow
 
 # Big Query
 google-cloud-bigquery
+db_dtypes
 
 # Autres
 spacy
+sklearn
