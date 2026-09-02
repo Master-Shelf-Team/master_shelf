@@ -25,4 +25,4 @@ db_dtypes
 
 # Autres
 spacy
-sklearn
+scikit-learn

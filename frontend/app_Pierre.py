@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import html
 import json
-
+from pathlib import Path
 import requests
 import streamlit as st
 from PIL import Image
 import os
 import numpy as np
+import ast
 
 st.set_page_config(
     page_title="Master Shelf",
@@ -19,7 +20,7 @@ st.set_page_config(
 SERVICE_URL = os.environ.get("SERVICE_URL")
 
 DIETS = [
-    "not important", "dietary", "low-carb", "low-sodium", "low-cholesterol", "healthy",
+    "", "dietary", "low-carb", "low-sodium", "low-cholesterol", "healthy",
     "vegetarian", "low-calorie", "low-protein", "healthy-2", "inexpensive",
     "low-saturated-fat", "kid-friendly", "low-fat", "pasta-rice-and-grains",
     "comfort-food", "spicy", "kosher", "very-low-carbs", "diabetic",
@@ -28,7 +29,7 @@ DIETS = [
 ]
 
 ORIGINS = [
-    "not important", "north-american", "american", "european", "asian", "mexican",
+    "", "north-american", "american", "european", "asian", "mexican",
     "australian", "canadian", "southwestern-united-states", "midwestern",
     "south-west-pacific", "thai", "chinese", "southern-united-states",
     "african", "jewish-ashkenazi", "italian", "indian", "tex-mex",
@@ -41,7 +42,7 @@ ORIGINS = [
 ]
 
 DISHES = [
-    "not important", "vegetables", "salads", "cookies-and-brownies", "beverages", "sandwiches",
+    "", "vegetables", "salads", "cookies-and-brownies", "beverages", "sandwiches",
     "breads", "pasta", "sweet", "sauces", "quick-breads",
     "salad-dressings", "cocktails", "bisques-cream-soups", "cakes", "bar-cookies",
     "candy", "spaghetti", "savory-sauces", "puddings-and-mousses", "cobblers-and-crisps",
@@ -54,7 +55,7 @@ DISHES = [
 ]
 
 OCCASIONS = [
-    "not important", "dinner-party", "brunch", "to-go", "potluck", "summer",
+    "", "dinner-party", "brunch", "to-go", "potluck", "summer",
     "christmas", "fall", "spring", "winter", "romantic",
     "picnic", "independence-day", "new-years", "thanksgiving", "st-patricks-day",
     "valentines-day", "camping", "barbecue", "wedding", "mardi-gras-carnival",
@@ -62,63 +63,17 @@ OCCASIONS = [
 ]
 
 MEALS = [
-    "not important", "main-dish", "appetizers", "dinner-party", "desserts", "lunch",
+    "", "main-dish", "appetizers", "dinner-party", "desserts", "lunch",
     "brunch", "side-dishes", "one-dish-meal", "beverages", "breakfast",
     "potluck", "snacks", "picnic", "cocktails", "finger-food",
     "frozen-desserts", "barbecue"
 ]
 
-PANTRY_ITEMS = [
-    "alcohol", "all", "almond", "apple", "apple juice", "apricot",
-    "artichoke hearts", "asparagus", "avocado", "baking powder", "baking soda",
-    "banana", "barbecue", "barbecue sauce", "basil", "bean sprouts", "beef",
-    "beef broth", "bell pepper", "beverages", "black bean", "blueberry",
-    "boiling water", "bread", "breadcrumb", "broccoli", "broth", "brown sugar",
-    "butter", "cabbage", "cajun", "californian", "camping", "canadian",
-    "capers", "cardamom", "carrot", "cashew", "cauliflower", "cayenne",
-    "cayenne pepper", "celery", "celery seed", "central-american", "cheese",
-    "cherry", "chicken", "chicken broth", "chili", "chili sauce", "chinese",
-    "chives", "chocolate", "christmas", "cilantro mint", "cinnamon", "clove",
-    "cloves", "cocktails", "coconut", "coconut milk", "coffee", "cold water",
-    "comfort-food", "cooking oil", "cooking spray", "coriander", "corn",
-    "corn syrup", "cornmeal", "cornstarch", "cranberries", "cream",
-    "cream cheese", "cuban", "cucumber", "cumin", "curry powder", "dairy-free",
-    "danish", "date", "desserts", "diabetic", "dietary", "dill", "dinner-party",
-    "dried cranberries", "easter", "egg", "egg-free", "eggplant", "english",
-    "european", "fall", "finger-food", "fish", "fish sauce", "flour",
-    "frozen-desserts", "garlic", "german", "ginger", "gluten-free",
-    "graham cracker crumbs", "grape", "green beans", "green onion", "greek",
-    "ground", "guatemalan", "hanukkah", "healthy", "healthy-2", "heavy cream",
-    "heirloom-historical", "hoisin sauce", "honey", "horseradish", "hot pepper sauce",
-    "hot sauce", "hot water", "ice cream", "ice cubes", "independence-day",
-    "indian", "indonesian", "inexpensive", "infant-baby-friendly", "italian",
-    "italian seasoning", "japanese", "jewish-ashkenazi", "ketchup", "kid-friendly",
-    "kidney bean", "kosher", "lemon", "lemon juice", "lemon pepper", "lettuce",
-    "lime", "lime juice", "lunch", "main-dish", "mardi-gras-carnival", "maple syrup",
-    "marshmallows", "mayonnaise", "mexican", "midwestern", "milk", "mint leaves",
-    "mixed vegetables", "molasses", "monterey jack", "mushroom", "mustard",
-    "mustard powder", "mustard seed", "new-years", "nigerian", "noodles",
-    "north-american", "northeastern-united-states", "nutmeg", "nuts", "oatmeal",
-    "oats", "oil", "olives", "onion", "onion powder", "orange", "orange juice",
-    "oregano", "pacific-northwest", "pakistani", "paprika", "parsley", "pasta",
-    "pasta-rice-and-grains", "peach", "peanut", "peanut butter", "peanut oil",
-    "pear", "peas", "pecans", "pepper", "pepperoni", "pesto", "picnic", "pineapple",
-    "pineapple juice", "pork", "potato", "potluck", "powdered sugar", "pumpkin",
-    "pumpkin pie spice", "raisins", "raspberry", "refried beans", "rice",
-    "romantic", "rosemary", "sage", "salat", "salmon", "salsa", "sausage",
-    "scandinavian", "seasoning", "sesame oil", "sesame seeds", "shallots",
-    "shellfish", "shrimp", "side-dishes", "snacks", "soup", "sour cream",
-    "south-african", "south-american", "south-west-pacific", "southern-united-states",
-    "southwestern-united-states", "spicy", "spinach", "splenda sugar substitute",
-    "spray", "spring", "st-patricks-day", "steak", "strawberry", "sugar", "summer",
-    "super-bowl", "sweet potato", "taco seasoning", "tarragon", "tartar", "tex-mex",
-    "thai", "thanksgiving", "thyme", "toddler-friendly", "to-go", "tofu", "tomato",
-    "tomato paste", "tomato sauce", "tortilla chips", "tuna", "turkey", "turmeric",
-    "valentines-day", "vanilla", "vegetable broth", "vegetarian", "very-low-carbs",
-    "vietnamese", "vinegar", "walnut", "warm water", "water", "water chestnuts",
-    "wedding", "whipped cream", "whipped topping", "winter", "worcestershire sauce",
-    "yellow cake mix", "yogurt", "zucchini"
-]
+BASE_DIR = Path(__file__).resolve().parent
+ingredients_path = BASE_DIR / "ingredients.txt"
+
+with open(ingredients_path, "r", encoding="utf-8") as f:
+    PANTRY_ITEMS = [line.strip() for line in f if line.strip()]
 
 SAMPLE_RECIPES = [
     {
@@ -189,6 +144,14 @@ def inject_css() -> None:
             background-color: C7B383;
         }
 
+        p {
+            color: #3d2a1f;
+        }
+
+        button > div > span > div > p {
+                    color: #ffffff;
+                }
+
         .stApp {
             background:
                 radial-gradient(1200px 500px at 10% -10%, #f3d7b5 0%, transparent 55%),
@@ -239,6 +202,7 @@ def inject_css() -> None:
             max-width: 42rem;
             font-size: 1.05rem;
             opacity: 0.92;
+            color: rgba(255, 252, 246, 0.86);
         }
 
         .panel {
@@ -267,10 +231,6 @@ def inject_css() -> None:
             border-radius: 999px;
             padding: 0.22rem 0.7rem;
             font-size: 0.8rem;
-        }
-
-        p {
-            color: #3d2a1f;
         }
 
         .recipe-card {
@@ -342,6 +302,10 @@ def inject_css() -> None:
             color: white;
         }
 
+         {
+            color: rgba(255, 252, 246, 0.86);
+        }
+
         div[data-testid="stFileUploader"] section {
             background: #fffaf2;
             border-radius: 16px;
@@ -387,7 +351,7 @@ def recipes_from_api(payload: object) -> list[dict]:
 def render_recipe(recipe: dict, time_max: int, diet: str, origin: str) -> None:
     title = recipe.get("title") or recipe.get("name") or "Ta recette"
     steps = [str(step).strip() for step in recipe.get("steps") or [] if str(step).strip()]
-    ingredients = [str(ingredient).strip() for ingredient in recipe.get("ingredients") or [] if str(ingredient).strip()]
+    ingredients = [str(ingredient).strip() for ingredient in recipe.get("ingredients_raw") or [] if str(ingredient).strip()]
     if not steps:
         st.warning("L'API a répondu, mais sans étapes de recette.")
         return
@@ -396,7 +360,7 @@ def render_recipe(recipe: dict, time_max: int, diet: str, origin: str) -> None:
         (
             "<li>"
             f'<span class="step-num">{index}</span>'
-            f"<span>{html.escape(step)}</span>"
+            f"<span>{html.escape(step).capitalize()}</span>"
             "</li>"
         )
         for index, step in enumerate(steps, start=1)
@@ -527,7 +491,7 @@ with right:
     pantry_selected = st.multiselect(
     label="Ingrédients de base à disposition (hors frigo) :",
     options=PANTRY_ITEMS,
-    default=["butter", "pepper"],  # Pré-cochés par défaut si besoin
+    default=["butter", "pepper", "vanilla", "bell pepper", "black pepper", "garlic", "bread", "pasta", "onion"],  # Pré-cochés par défaut si besoin
     help="Cherche et sélectionne les ingrédients de ton placard",
     )
 
@@ -554,14 +518,15 @@ if go:
                 )
             )
         payload = {
-                        "time_max": time_max,
-                        "occasion": occasion,
-                        "dish": dish,
-                        "meal": meal,
-                        "diet": diet,
-                        "origin": origin,
+                        "time_max": str(time_max),
+                        "occasion": [occasion],
+                        "dish": [dish],
+                        "meal": [meal],
+                        "diet": [diet],
+                        "origin": [origin],
                         "pantry_items": pantry_selected,
                     }
+        print(payload)
         form_data = {"data": json.dumps(payload)}
 
         try:
