@@ -13,7 +13,7 @@ def predict_closer(user , df_clean):
     mlb_origin = MultiLabelBinarizer()
     mlb_time_to_make = MultiLabelBinarizer()
 
-
+    print("1")
     param_grid = {'dish':[3], 'diet':[5], 'meal':[1], 'occasion':[1],
               'origin':[1], 'time_to_make':[3]}
 
@@ -28,24 +28,27 @@ def predict_closer(user , df_clean):
     X_origin = mlb_origin.fit_transform(df_clean['type_origin'])
     X_time_to_make = mlb_time_to_make.fit_transform(df_clean['time_to_make'])
 
-    history = get_history()
+    print("2")
+    # history = get_history()
 
-    if not user["dish"] and not user["origin"] and user["time_max"] == "0" and not user["diet"] and not user["meal"] and not user["occasion"]:
-        X_test_dish = mlb_dish.transform([[max(set(history["dish"]), key=history["dish"].count)]])
-        X_test_diet = mlb_diet.transform([[max(set(history["diet"]), key=history["diet"].count)]])
-        X_test_meal = mlb_meal.transform([[max(set(history["meal"]), key=history["meal"].count)]])
-        X_test_occasion = mlb_occasion.transform([[max(set(history["occasion"]), key=history["occasion"].count)]])
-        X_test_origin = mlb_origin.transform([[max(set(history["origin"]), key=history["origin"].count)]])
-        X_test_time_to_make = mlb_time_to_make.transform([[max(set(history["time_max"]), key=history["time_max"].count)]])
-    else:
-        X_test_dish = mlb_dish.transform([user["dish"]])
-        X_test_diet = mlb_diet.transform([user['diet']])
-        X_test_meal = mlb_meal.transform([user["meal"]])
-        X_test_occasion = mlb_occasion.transform([user['occasion']])
-        X_test_origin = mlb_origin.transform([user['origin']])
-        X_test_time_to_make = mlb_time_to_make.transform([user['time_max']])
+    # if user["dish"] == "" and user["origin"] == "" and user["time_max"] == "0" and user["diet"] == "" and user["meal"] == "" and user["occasion"] == "":
+    #     print("if")
+    #     X_test_dish = mlb_dish.transform([[max(set(history["dish"]), key=history["dish"].count)]])
+    #     X_test_diet = mlb_diet.transform([[max(set(history["diet"]), key=history["diet"].count)]])
+    #     X_test_meal = mlb_meal.transform([[max(set(history["meal"]), key=history["meal"].count)]])
+    #     X_test_occasion = mlb_occasion.transform([[max(set(history["occasion"]), key=history["occasion"].count)]])
+    #     X_test_origin = mlb_origin.transform([[max(set(history["origin"]), key=history["origin"].count)]])
+    #     X_test_time_to_make = mlb_time_to_make.transform([[max(set(history["time_max"]), key=history["time_max"].count)]])
+    # else:
+    print("else")
+    X_test_dish = mlb_dish.transform([list(user["dish"])])
+    X_test_diet = mlb_diet.transform([list(user['diet'])])
+    X_test_meal = mlb_meal.transform([list(user["meal"])])
+    X_test_occasion = mlb_occasion.transform([list(user['occasion'])])
+    X_test_origin = mlb_origin.transform([list(user['origin'])])
+    X_test_time_to_make = mlb_time_to_make.transform([user['time_max']])
 
-
+    print("3")
     result = []
     for param in grid:
         X = hstack([X_dish * param['dish'],X_diet * param['diet'],X_meal*param['meal'],
@@ -68,8 +71,28 @@ def predict_closer(user , df_clean):
         "score": distances,
         "recipe_index": indices
     })
-        print(X_test)
-    return result
+
+    print("4")
+    response = []
+    for i in list(result[0]["recipe_index"][0]):
+        dict = {}
+        dict["name"] = str(df_clean.iloc[i]["name"])
+        dict["ingredients_raw"] = list(df_clean.iloc[i]["ingredients_raw"])
+        dict["steps"] = list(df_clean.iloc[i]["steps"])
+        dict["servings"] = int(df_clean.iloc[i]["servings"])
+        dict["persons"] = int(df_clean.iloc[i]["persons"])
+        dict["portion_size"] = df_clean.iloc[i]["portion_size"]
+        dict["ingredients_clean"] = list(df_clean.iloc[i]["ingredients_clean"])
+        dict["type_dish"] = list(df_clean.iloc[i]["type_dish"])
+        dict["type_diet"] = list(df_clean.iloc[i]["type_diet"])
+        dict["type_meal"] = list(df_clean.iloc[i]["type_meal"])
+        dict["type_occasion"] = list(df_clean.iloc[i]["type_occasion"])
+        dict["type_origin"] = list(df_clean.iloc[i]["type_origin"])
+        dict["time_to_make"] = df_clean.iloc[i]["time_to_make"]
+        response.append(dict)
+
+    print("5")
+    return response
 
 
 def get_history():

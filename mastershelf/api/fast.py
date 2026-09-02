@@ -48,18 +48,18 @@ async def ingredients(
 
     print(f"🔎 Recherche de la meilleure recette pour la liste d'ingrédients 🔎")
 
-    try:
-        # Si la chaîne contient le dictionnaire complet ('{"contraintes": ...}')
-        parsed = ast.literal_eval(data)
-        if isinstance(parsed, dict) and "contraintes" in parsed:
-            contraintes_dict = json.loads(parsed["contraintes"])
-        else:
-            contraintes_dict = (
-                json.loads(parsed) if isinstance(parsed, str) else parsed
-            )
-    except Exception:
-        contraintes_dict = json.loads(data)
+    # try:
+    #     # Si la chaîne contient le dictionnaire complet ('{"contraintes": ...}')
+    #     parsed = ast.literal_eval(data)
+    #     if isinstance(parsed, dict) and "contraintes" in parsed:
+    #         contraintes_dict = json.loads(parsed["contraintes"])
+    #     else:
+    #         contraintes_dict = (
+    #             json.loads(parsed) if isinstance(parsed, str) else parsed
+    #         )
+    # except Exception:
 
+    contraintes_dict = json.loads(data)
     pantry_items = contraintes_dict["pantry_items"]
 
     print("Dict final récuperé :", contraintes_dict)
@@ -67,7 +67,10 @@ async def ingredients(
 
     print("Ing_list", ing_list)
 
-    results = get_matching_recipes(ing_list, pantry_items)
+    results = get_matching_recipes(ing_list, pantry_items, contraintes_dict)
+
+
+    print("--------------------------Je veux ça--------------------", results)
 
     print(f"💥 Meilleure recette trouvée ! 💥\n ➡️ Envoie de la réponse au Front")
 

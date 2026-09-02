@@ -1,11 +1,12 @@
 from mastershelf.recipes.preprocessing import *
 from mastershelf.inventory.inventory import *
+from mastershelf.algo_filter.recommendation import *
 import re
 from google.cloud import bigquery
 import json
 
 
-def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> list[dict]:
+def get_matching_recipes(user_ingredients_list: dict, pantry_items: list, user_dict: dict) -> list[dict]:
     client = bigquery.Client()
 
     user_inventory = pantry_items
@@ -29,27 +30,27 @@ def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> lis
     print("2 - On lance la query !")
 
     query = """
-    WITH user_ingredients AS (
-      SELECT DISTINCT LOWER(TRIM(ing)) AS ing
-      FROM UNNEST(@user_ing_list) AS ing
-    )
+      WITH user_ingredients AS (
+          SELECT DISTINCT LOWER(TRIM(ing)) AS ing
+          FROM UNNEST(@user_ing_list) AS ing
+      )
 
-    SELECT
-      r.name,
-      r.steps,
-      r.ingredients,
-      ARRAY_LENGTH(r.ingredients) AS nb_ingredients_utilises
-    FROM `le-wagon-ds-2327.mastershelf.recipes_array` r
-    WHERE ARRAY_LENGTH(r.ingredients) > 0
-      AND (
-        -- COUNT(DISTINCT) empêche qu'un ingrédient comptabilise plusieurs matchs
-        SELECT COUNT(DISTINCT recipe_ing)
-        FROM UNNEST(r.ingredients) AS recipe_ing
-        JOIN user_ingredients ui
-          ON STRPOS(LOWER(recipe_ing), ui.ing) > 0
-      ) = ARRAY_LENGTH(r.ingredients)
-    ORDER BY nb_ingredients_utilises DESC LIMIT 5;
+      SELECT *
+      FROM `wagon-bootcamp-501612-i1.recipes_clean_300.recipes_final_array` r
+
+      WHERE ARRAY_LENGTH(r.ingredients_clean) > 0
+          AND NOT EXISTS (
+          SELECT 1
+          FROM UNNEST(r.ingredients_clean) AS recipe_ing
+          WHERE LOWER(TRIM(recipe_ing)) NOT IN (
+          SELECT ing
+          FROM user_ingredients
+          )
+      )
+
+      LIMIT 20;
     """
+
     #J'ai changé la query pour trouver un exact match , sinon eggplant = egg , maintenat que tout est catégorisé c'est plus rapide
     # et le chemin vers le nouveau dataset propre final
 
@@ -60,9 +61,17 @@ def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> lis
             )
         ]
     )
-
+    print("1")
     query_job = client.query(query, job_config=job_config)
-    results = query_job.result()
+    print("2")
+    df = query_job.to_dataframe()
+    print("3")
+
+    # results = query_job.result()
+    results = predict_closer(user_dict, df)
+    print("4")
+
+    print("Résultat de predict Closer : ", results)
 
     print("3 - On retourne les résultats !")
 
@@ -80,7 +89,7 @@ def get_matching_recipes(user_ingredients_list: dict, pantry_items: list) -> lis
 
         recipes.append(recipe)
 
-    return recipes
+    return results
 
 
 # # Exemple d'appel de la fonction :
