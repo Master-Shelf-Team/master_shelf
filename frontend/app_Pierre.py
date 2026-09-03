@@ -144,8 +144,8 @@ def inject_css() -> None:
             background-color: C7B383;
         }
 
-        p {
-            color: #3d2a1f;
+        label {
+            color: #3d2a1f !important;
         }
 
         button > div > span > div > p {
@@ -289,7 +289,7 @@ def inject_css() -> None:
         }
 
         .stButton > button {
-            background: #C45C26;
+            background: #c45c26;
             color: white;
             border: 0;
             border-radius: 999px;
