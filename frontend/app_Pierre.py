@@ -491,7 +491,7 @@ with right:
     pantry_selected = st.multiselect(
     label="Ingrédients de base à disposition (hors frigo) :",
     options=PANTRY_ITEMS,
-    default=["butter", "pepper", "vanilla", "bell pepper", "black pepper", "garlic", "bread", "pasta", "onion"],  # Pré-cochés par défaut si besoin
+    default=["butter", "pepper", "vanilla", "bread", "pasta", "onion"],  # Pré-cochés par défaut si besoin
     help="Cherche et sélectionne les ingrédients de ton placard",
     )
 
